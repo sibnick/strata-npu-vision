@@ -19,7 +19,7 @@ driver packages for Ubuntu 24.04 (version `1.10.1.20241220-12430270326`) and
 `openvino==2026.4.1`; everything else comes from Ubuntu and PyPI.
 
 Validation honesty: GitHub runners have no NPU.  The workflow here only builds
-and publishes; the image recipe was validated by hand on a Core Ultra 5 125H
+and publishes; the image recipe was validated by hand on a Core Ultra 7 265K
 with the driver pinned above, exactly as the linked README describes
 (2026-10-24).  If you run the published image and the NPU shows up
 (`npu_health.py` says `devices: ['CPU', 'NPU']`), that is the same check.
