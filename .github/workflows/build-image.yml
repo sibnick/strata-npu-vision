@@ -1,9 +1,9 @@
 name: build-image
 
-"Publish the Strata NPU picture-reader image. The image recipe lives in the
-Strata repository (container/npu-vision, branch below); this repo only builds
-and publishes it, because CI machines have no NPU and validation happens on
-real hardware (see README)."
+# Publish the Strata NPU picture-reader image.  The image recipe lives in the
+# Strata repository (container/npu-vision, branch below); this repo only builds
+# and publishes it, because CI machines have no NPU and validation happens on
+# real hardware (see README).
 
 on:
   workflow_dispatch:
