@@ -1,0 +1,56 @@
+name: build-image
+
+"Publish the Strata NPU picture-reader image. The image recipe lives in the
+Strata repository (container/npu-vision, branch below); this repo only builds
+and publishes it, because CI machines have no NPU and validation happens on
+real hardware (see README)."
+
+on:
+  workflow_dispatch:
+    inputs:
+      strata_repo:
+        description: "Strata repository to build (owner/name)"
+        default: sibnick/Strata
+        required: true
+      strata_ref:
+        description: "Strata branch or tag to build"
+        default: npu-vision-reader
+        required: true
+      tags:
+        description: "image tags, comma separated (no registry prefix)"
+        default: latest,driver1.10.1-ov2026.4.1
+        required: true
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.strata_repo }}
+          ref: ${{ inputs.strata_ref }}
+          path: strata
+
+      - name: stage the reader into the build directory
+        run: strata/container/npu-vision/fetch_tools.sh
+
+      - name: image tags
+        id: tags
+        run: |
+          echo "tags=$(echo '${{ inputs.tags }}' | sed 's/[^, ]*/ghcr.io\/sibnick\/strata-npu-vision:&/g' | tr ',' '\n' | paste -sd, -)" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: strata/container/npu-vision
+          push: true
+          platforms: linux/amd64
+          tags: ${{ steps.tags.outputs.tags }}
